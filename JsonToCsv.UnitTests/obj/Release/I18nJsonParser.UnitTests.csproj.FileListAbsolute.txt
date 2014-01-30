@@ -1,0 +1,11 @@
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonToCsv.UnitTests.dll
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonToCsv.UnitTests.pdb
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonFx.dll
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonToCsv.exe
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\Newtonsoft.Json.dll
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonToCsv.pdb
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\JsonFx.xml
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\bin\Release\Newtonsoft.Json.xml
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\obj\Release\I18nJsonParser.UnitTests.csprojResolveAssemblyReference.cache
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\obj\Release\JsonToCsv.UnitTests.dll
+C:\Users\bgarvey\SkyDrive\JsonToCsv\JsonToCsv.UnitTests\obj\Release\JsonToCsv.UnitTests.pdb
