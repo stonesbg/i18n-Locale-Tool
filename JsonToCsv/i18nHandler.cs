@@ -250,7 +250,7 @@ namespace JsonToCsv
             return json;
         }
 
-        private Dictionary<string, object> CreateDictionaryFromFile(string filePath = @"C:\Users\stones\SkyDrive\JsonToCsv\wfo.Common.json")
+        private Dictionary<string, object> CreateDictionaryFromFile(string filePath)
         {
             //Load in File
             string json = File.ReadAllText(filePath);
@@ -366,7 +366,7 @@ namespace JsonToCsv
         {
             var serviceRootUri = new Uri("https://api.datamarket.azure.com/Bing/MicrosoftTranslator/");
 
-            var accountKey = "7jWxVYAUmeekxfcXgMpBEkT1uRXFXEsaSsnMRABEhm8";
+            var accountKey = "BING_ACCOUNT_KEY";
 
             var tc = new TranslatorContainer(serviceRootUri);
 
