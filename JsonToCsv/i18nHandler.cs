@@ -1,4 +1,7 @@
-﻿using JsonFx.Json;
+﻿using i18n.Helper;
+using i18n.Helper.BingTranslate;
+using i18n.LocaleTool.Models;
+using JsonFx.Json;
 using Microsoft;
 using System;
 using System.Collections.Generic;
@@ -19,6 +22,13 @@ namespace JsonToCsv
 
     public class i18nHandler
     {
+        BingHandler _bingHandler;
+
+        public i18nHandler()
+        {
+            _bingHandler = new BingHandler();
+        }
+
         public void CreateDictionaryFile(string filePath, string outputPath, SaveType type, string languageCode = null)
         {
             List<i18nDirectoryFile> dictionaries = null;
@@ -84,12 +94,9 @@ namespace JsonToCsv
                     foreach(string key in keys)
                     {
                         string untranslatedFile = dictonary.Dictionary[key].ToString();
+                        var translationResult = _bingHandler.Translate(untranslatedFile, sourceLanguage, languageCode);
 
-                        TranslatorContainer tc = InitializeTranslator();
-
-                        var translationResult = TranslateString(tc, untranslatedFile, sourceLanguage, languageCode);
-
-                        dictonary.Dictionary[key] = translationResult.Text;
+                        dictonary.Dictionary[key] = translationResult;
                     }
 
                     string json = CreateJsonFile(dictonary.Dictionary);
@@ -344,34 +351,6 @@ namespace JsonToCsv
             }
 
             return outputFullPath;
-        }
-
-        public Translation TranslateString(TranslatorContainer tc, string inputString, string sourceLanguage, string targetLanguage)
-        {
-            var translationQuery = tc.Translate(inputString, targetLanguage, sourceLanguage);
-
-            var translationResults = translationQuery.Execute().ToList();
-
-            if (translationResults.Count() <= 0)
-            {
-                return null;
-            }
-
-            var translationResult = translationResults.First();
-
-            return translationResult;
-        }
-
-        public TranslatorContainer InitializeTranslator()
-        {
-            var serviceRootUri = new Uri("https://api.datamarket.azure.com/Bing/MicrosoftTranslator/");
-
-            var accountKey = "BING_ACCOUNT_KEY";
-
-            var tc = new TranslatorContainer(serviceRootUri);
-
-            tc.Credentials = new NetworkCredential(accountKey, accountKey);
-            return tc;
         }
     }
 }

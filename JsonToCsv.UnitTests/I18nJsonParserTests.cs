@@ -6,8 +6,9 @@ using Newtonsoft.Json.Linq;
 using System.Dynamic;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using i18n.Helper;
 
-namespace JsonToCsv.UnitTests
+namespace i18n.Helper.UnitTests
 {
     [TestClass]
     public class I18nJsonParserTests
