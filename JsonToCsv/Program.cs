@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.Services.Client;
 using Microsoft;
+using i18n.LocaleTool;
+using CommandLine;
 
 namespace JsonToCsv
 {
@@ -18,6 +20,22 @@ namespace JsonToCsv
         static void Main(string[] args)
         {
             i18nHandler handler = new i18nHandler();
+
+            ///Parse Command Line
+            Options options = new Options();
+            Parser parser = new Parser();
+            if (parser.ParseArguments(args, options))
+            {
+                // consume Options type properties
+                if (options.Verbose)
+                {
+                    Console.WriteLine(options.InputFileFolder);
+                    Console.WriteLine(options.OutputFileFolder);
+                    Console.WriteLine(options.TargetLanguage);
+                }
+                else
+                    Console.WriteLine("working ...");
+            }
 
             ConsoleKeyInfo cki;
             // Prevent example from ending if CTL+C is pressed.
@@ -47,19 +65,27 @@ namespace JsonToCsv
                 case ConsoleKey.NumPad1:
                     Console.WriteLine("Option 1 Selected");
 
-                    filePath = WaitForUserInput("Path to Folder of Json Files or File:");
-                    outputPath = WaitForUserInput("Folder where file(s) to be saved or leave empty:");
-
-                    if (handler.IsDirectory(filePath))
+                    if (String.IsNullOrEmpty(options.InputFileFolder))
                     {
-                        foreach (string file in handler.DirSearch(filePath))
+                        options.InputFileFolder = WaitForUserInput("Path to Folder of Json Files or File:");
+                    }
+
+                    if (String.IsNullOrEmpty(options.OutputFileFolder))
+                    {
+                        options.OutputFileFolder = WaitForUserInput("Folder where file(s) to be saved or leave empty:");
+                    }
+
+
+                    if (handler.IsDirectory(options.InputFileFolder))
+                    {
+                        foreach (string file in handler.DirSearch(options.InputFileFolder))
                         {
-                            handler.CreateDictionaryFile(file, outputPath, SaveType.Csv);
+                            handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Csv);
                         }
                     }
                     else
                     {
-                        handler.CreateDictionaryFile(filePath, outputPath, SaveType.Csv);
+                        handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Csv);
                     }
                     
                     Console.WriteLine("File Created");
