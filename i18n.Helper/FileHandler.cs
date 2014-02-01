@@ -63,6 +63,15 @@ namespace i18n.Helper
             return result;
         }
 
+        public string CreateJsonFile(Dictionary<string, object> dictionary)
+        {
+            object jsonObject = _jsonParser.GenerateJsonObject(dictionary);
+
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject, Newtonsoft.Json.Formatting.Indented);
+
+            return json;
+        }
+
         public List<String> DirSearch(string sDir)
         {
             var dirInfo = new DirectoryInfo(sDir);

@@ -79,5 +79,38 @@ namespace i18n.Helper.UnitTests
 
             Assert.IsTrue(true);           
         }
+
+        [TestMethod]
+        public void GenerateShortStringsFile_Tests()
+        {
+            string inputPath = "<SomeFile>";
+            string outputPath = "<OutputFile>";
+
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+
+            var fileHandler = fixture.Freeze<Mock<IFileHandler>>();
+            var jsonParser = fixture.Freeze<Mock<Ii18nJsonParser>>();
+
+            var directories = new List<I18NDirectoryFile>();
+            var i18nDictionary = new Dictionary<string, object>();
+            i18nDictionary.Add("Dashboard", "Dashboard");
+            i18nDictionary.Add("actions.create", "Create");
+            directories.Add(new I18NDirectoryFile()
+            {
+                Dictionary = i18nDictionary,
+            });
+
+            fileHandler.Setup(x => x.LoadJsonFileOrFolder(inputPath)).Returns(directories);
+            fileHandler.Setup(x => x.ConstructFilePath(outputPath, It.IsAny<FileInfo>(), SaveType.Json, "dev_Longest")).Returns(outputPath);
+            fileHandler.Setup(x => x.SaveJson(It.IsAny<string>(), It.IsAny<string>()));
+
+            jsonParser.Setup(y => y.GenerateJsonObject(It.IsAny<Dictionary<string, object>>(), "")).Returns(new object());
+
+            var sut = fixture.Create<i18nHandler>();
+
+            sut.GenerateShortestStringsFile(inputPath, outputPath);
+
+            Assert.IsTrue(true);
+        }
     }
 }

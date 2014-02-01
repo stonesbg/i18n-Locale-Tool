@@ -48,7 +48,6 @@
     <Compile Include="FileHandler.cs" />
     <Compile Include="I18NHandler.cs" />
     <Compile Include="I18NJsonParser.cs" />
-    <Compile Include="LocalizationHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

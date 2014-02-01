@@ -1,10 +1,6 @@
-﻿using i18n.Helper.BingTranslate;
-using i18n.Helper.Contracts;
+﻿using i18n.Helper.Contracts;
 using i18n.LocaleTool.Models;
-using JsonFx.Json;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 
@@ -14,13 +10,41 @@ namespace i18n.Helper
     {
         private readonly ITranslateHandler _translateHandler;
         private readonly IFileHandler _fileHandler;
-        private readonly Ii18nJsonParser _jsonParser;
 
-        public i18nHandler(ITranslateHandler translateHandler, IFileHandler fileHandler, Ii18nJsonParser jsonParser)
+        public i18nHandler(ITranslateHandler translateHandler, IFileHandler fileHandler)
         {
             _translateHandler = translateHandler;
             _fileHandler = fileHandler;
-            _jsonParser = jsonParser;
+        }
+
+        public void TranslateLocalizationFile(string languageCode, string inputPath, string outputPath)
+        {
+            if (_fileHandler.IsDirectory(inputPath))
+            {
+                foreach (string file in _fileHandler.DirSearch(inputPath))
+                {
+                    TranslateDictionaryFile(languageCode, file, outputPath);
+                }
+            }
+            else
+            {
+                TranslateDictionaryFile(languageCode, inputPath, outputPath);
+            }
+        }
+
+        public void FlattenLocalizationFile(string inputPath, string outputPath)
+        {
+            if (_fileHandler.IsDirectory(inputPath))
+            {
+                foreach (string file in _fileHandler.DirSearch(inputPath))
+                {
+                    CreateDictionaryFile(file, outputPath, SaveType.Csv);
+                }
+            }
+            else
+            {
+                CreateDictionaryFile(inputPath, outputPath, SaveType.Csv);
+            }
         }
 
         public void CreateDictionaryFile(string filePath, string outputPath, SaveType type, string languageCode = null)
@@ -89,7 +113,7 @@ namespace i18n.Helper
                         dictonary.Dictionary[key] = translationResult;
                     }
 
-                    string json = CreateJsonFile(dictonary.Dictionary);
+                    string json = _fileHandler.CreateJsonFile(dictonary.Dictionary);
                     var dirInfo = new DirectoryInfo(outputPath);
 
                     string outPath = dirInfo.FullName + @"\" + languageCode + @"\" + fileInfo.Name;
@@ -98,7 +122,7 @@ namespace i18n.Helper
             }
         }
 
-        public void GenerateFakeJsonFileForLanguageCode(string languageCode, string filePath, string outputPath)
+        public void GenerateFakeLocalizationFile(string languageCode, string filePath, string outputPath)
         {
             var dictionaries = _fileHandler.LoadJsonFileOrFolder(filePath);
 
@@ -161,6 +185,21 @@ namespace i18n.Helper
             }
         }
 
+        public void ConvertFlattenedFile(string inputPath, string outputPath)
+        {
+            if (_fileHandler.IsDirectory(inputPath))
+            {
+                foreach (string file in _fileHandler.DirSearch(inputPath))
+                {
+                    CreateDictionaryFile(file, outputPath, SaveType.Json);
+                }
+            }
+            else
+            {
+                CreateDictionaryFile(inputPath, outputPath, SaveType.Json);
+            }
+        }
+
         private void SaveDictionaries(string outputPath, IEnumerable<I18NDirectoryFile> dictionaries, SaveType type, string languageCode = null)
         {
             foreach (I18NDirectoryFile dictionaryItem in dictionaries)
@@ -171,7 +210,7 @@ namespace i18n.Helper
                 {
                     case SaveType.Json:
                         //Convert Dictionary to be json string
-                        string json = CreateJsonFile(dictionaryItem.Dictionary);
+                        string json = _fileHandler.CreateJsonFile(dictionaryItem.Dictionary);
                         _fileHandler.SaveJson(json, outputFullPath);
                         break;
                     case SaveType.Csv:
@@ -180,16 +219,5 @@ namespace i18n.Helper
                 }
             }
         }
-
-        private string CreateJsonFile(Dictionary<string, object> dictionary)
-        {
-            object jsonObject = _jsonParser.GenerateJsonObject(dictionary);
-
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject, Newtonsoft.Json.Formatting.Indented);
-
-            return json;
-        }
-
-        
     }
 }
