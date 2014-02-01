@@ -173,7 +173,6 @@ namespace i18n.Helper
                 var longestDictionary = new I18NDirectoryFile()
                 {
                     Dictionary = new Dictionary<string, object>(),
-                    FileInfo = new FileInfo(filePath),
                 };
 
                 getUniqueKeys.ForEach(

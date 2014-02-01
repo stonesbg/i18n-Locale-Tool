@@ -112,5 +112,70 @@ namespace i18n.Helper.UnitTests
 
             Assert.IsTrue(true);
         }
+
+        [TestMethod]
+        public void ConvertFlattenedFile_SingleFile()
+        {
+            string inputPath = "<SomeFile>";
+            string outputPath = "<OutputFile>";
+
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+
+            var fileHandler = fixture.Freeze<Mock<IFileHandler>>();
+            var jsonParser = fixture.Freeze<Mock<Ii18nJsonParser>>();
+
+            var directories = new List<I18NDirectoryFile>();
+            var i18nDictionary = new Dictionary<string, object>();
+            i18nDictionary.Add("Dashboard", "Dashboard");
+            i18nDictionary.Add("actions.create", "Create");
+            directories.Add(new I18NDirectoryFile()
+            {
+                Dictionary = i18nDictionary,
+            });
+
+            fileHandler.Setup(x => x.IsDirectory(inputPath)).Returns(false);
+            fileHandler.Setup(x => x.SaveJson(It.IsAny<string>(), It.IsAny<string>()));
+
+            jsonParser.Setup(y => y.GenerateJsonObject(It.IsAny<Dictionary<string, object>>(), "")).Returns(new object());
+
+            var sut = fixture.Create<i18nHandler>();
+
+            sut.ConvertFlattenedFile(inputPath, outputPath);
+
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod]
+        public void ConvertFlattenedFile_Directory()
+        {
+            string inputPath = "<SomeFile>";
+            string outputPath = "<OutputFile>";
+
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+
+            var fileHandler = fixture.Freeze<Mock<IFileHandler>>();
+            var jsonParser = fixture.Freeze<Mock<Ii18nJsonParser>>();
+
+            var directories = new List<I18NDirectoryFile>();
+            var i18nDictionary = new Dictionary<string, object>();
+            i18nDictionary.Add("Dashboard", "Dashboard");
+            i18nDictionary.Add("actions.create", "Create");
+            directories.Add(new I18NDirectoryFile()
+            {
+                Dictionary = i18nDictionary,
+            });
+
+            fileHandler.Setup(x => x.IsDirectory(inputPath)).Returns(true);
+            fileHandler.Setup(x => x.DirSearch(inputPath)).Returns(new List<string> { inputPath });
+            fileHandler.Setup(x => x.SaveJson(It.IsAny<string>(), It.IsAny<string>()));
+
+            jsonParser.Setup(y => y.GenerateJsonObject(It.IsAny<Dictionary<string, object>>(), "")).Returns(new object());
+
+            var sut = fixture.Create<i18nHandler>();
+
+            sut.ConvertFlattenedFile(inputPath, outputPath);
+
+            Assert.IsTrue(true);
+        }
     }
 }
