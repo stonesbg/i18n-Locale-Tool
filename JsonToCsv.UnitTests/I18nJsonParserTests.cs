@@ -1,12 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
-using Newtonsoft.Json.Linq;
-using System.Dynamic;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
-using i18n.Helper;
 
 namespace i18n.Helper.UnitTests
 {
@@ -47,14 +42,14 @@ namespace i18n.Helper.UnitTests
                 ""nodata"": ""This list does not contain any items.""
             }}";
 
-            var parser = new I18nJsonParser(); //using System.Web.Script.Serialization;
+            var parser = new I18NJsonParser(); //using System.Web.Script.Serialization;
             var reader = new JsonFx.Json.JsonReader();
             dynamic output = reader.Read(json);
-            Dictionary<string, object> dict = new Dictionary<string, object>();
+            var dict = new Dictionary<string, object>();
 
             parser.GenerateDictionary((System.Dynamic.ExpandoObject)output, dict, "");
             Assert.IsNotNull(dict);
-            Assert.AreSame(dict["Dashboard"], "Dashboard");
+            Assert.AreEqual(dict["Dashboard"], "Dashboard");
         }
 
         [TestMethod]
@@ -68,7 +63,7 @@ namespace i18n.Helper.UnitTests
             localizationValues.Add("actions.edit.default", "editor");
             localizationValues.Add("actions.edit.edit", "update");
 
-            var parser = new I18nJsonParser(); //using System.Web.Script.Serialization;
+            var parser = new I18NJsonParser(); //using System.Web.Script.Serialization;
             object jsonObject = parser.GenerateJsonObject(localizationValues, "");
 
             string json = JsonConvert.SerializeObject(jsonObject, new KeyValuePairConverter());

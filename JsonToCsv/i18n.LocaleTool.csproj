@@ -60,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="i18nHandler.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,17 +69,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\i18n.Helper.BingTranslate\i18n.Helper.BingTranslate.csproj">
-      <Project>{d6a7337f-4cd2-45a1-b04c-324739076ac5}</Project>
-      <Name>i18n.Helper.BingTranslate</Name>
-    </ProjectReference>
     <ProjectReference Include="..\i18n.Helper\i18n.Helper.csproj">
       <Project>{ab3f7aeb-0f86-44ec-8915-babce2a82124}</Project>
       <Name>i18n.Helper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.LocaleTool.Models.csproj">
-      <Project>{2791e587-d414-4258-b822-30618359cff3}</Project>
-      <Name>i18n.LocaleTool.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

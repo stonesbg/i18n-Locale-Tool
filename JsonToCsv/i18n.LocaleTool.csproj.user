@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-i C:\Test</StartArguments>
+    <StartArguments>-o 4 -i "D:\Temp" -o "D:\Temp" -v</StartArguments>
   </PropertyGroup>
 </Project>

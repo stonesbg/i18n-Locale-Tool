@@ -1,14 +1,13 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace i18n.LocaleTool
 {
     public class Options
     {
+        [Option('o', "operation", Required = true, HelpText = "What operaton to initiate")]
+        public string Operation { get; set; }
+
         [Option('i', "input", Required = true, HelpText = "Input file or folder to read.")]
         public string InputFileFolder { get; set; }
 

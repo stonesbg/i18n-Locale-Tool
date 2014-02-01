@@ -58,6 +58,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="I18NHandlerTests.cs" />
     <Compile Include="I18nJsonParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -69,6 +70,13 @@
       <Project>{ab3f7aeb-0f86-44ec-8915-babce2a82124}</Project>
       <Name>i18n.Helper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.LocaleTool.Models.csproj">
+      <Project>{2791e587-d414-4258-b822-30618359cff3}</Project>
+      <Name>i18n.LocaleTool.Models</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

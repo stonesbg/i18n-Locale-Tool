@@ -1,18 +1,13 @@
-﻿using i18n.Helper;
-using i18n.Helper.BingTranslate;
+﻿using i18n.Helper.BingTranslate;
 using i18n.LocaleTool.Models;
 using JsonFx.Json;
-using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JsonToCsv
+namespace i18n.Helper
 {
     public enum SaveType
     {
@@ -20,11 +15,15 @@ namespace JsonToCsv
         Csv
     }
 
-    public class i18nHandler
+    public interface ILocalizationHandler
     {
-        BingHandler _bingHandler;
+    }
 
-        public i18nHandler()
+    public class I18NHandler
+    {
+        readonly BingHandler _bingHandler;
+
+        public I18NHandler()
         {
             _bingHandler = new BingHandler();
         }
@@ -33,21 +32,19 @@ namespace JsonToCsv
         {
             List<i18nDirectoryFile> dictionaries = null;
 
-            FileInfo fileInfo = new FileInfo(filePath);
+            var fileInfo = new FileInfo(filePath);
 
             if(outputPath.Trim().Length > 0 && languageCode == null)
             {
                 // Get the root above the parent Directory
                 // The Parent Directory is the language folder at least assumed.
-                DirectoryInfo dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
-                outputPath = dirInfo.Parent.Name + "ConvertedCsv" + @"\" + fileInfo.Name;
+                var dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
+                if (dirInfo.Parent != null) outputPath = dirInfo.Parent.Name + "ConvertedCsv" + @"\" + fileInfo.Name;
             }
-            else if (outputPath.Trim().Length > 0 && languageCode == null)
+            else if (outputPath.Trim().Length > 0 && languageCode != null)
             {
-                // Get the root above the parent Directory
-                // The Parent Directory is the language folder at least assumed.
-                DirectoryInfo dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
-                outputPath = dirInfo.Parent.Name + languageCode + @"\" + fileInfo.Name;
+                var dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
+                if (dirInfo.Parent != null) outputPath = dirInfo.Parent.Name + languageCode + @"\" + fileInfo.Name;
             }
 
             switch(fileInfo.Extension.ToLower())
@@ -71,11 +68,11 @@ namespace JsonToCsv
 
         public void TranslateDictionaryFile(string languageCode, string filePath, string outputPath)
         {
-            string sourceLanguage = "en";
+            const string sourceLanguage = "en";
 
             List<i18nDirectoryFile> dictionaries = null;
 
-            FileInfo fileInfo = new FileInfo(filePath);
+            var fileInfo = new FileInfo(filePath);
 
             switch (fileInfo.Extension.ToLower())
             {
@@ -84,13 +81,11 @@ namespace JsonToCsv
                     break;
             }
 
-            var newI18nDirectoryFile = new List<i18nDirectoryFile>();
-
             if (dictionaries != null)
             {
                 foreach (i18nDirectoryFile dictonary in dictionaries)
                 {
-                    List<string> keys = new List<string>(dictonary.Dictionary.Keys);
+                    var keys = new List<string>(dictonary.Dictionary.Keys);
                     foreach(string key in keys)
                     {
                         string untranslatedFile = dictonary.Dictionary[key].ToString();
@@ -100,7 +95,7 @@ namespace JsonToCsv
                     }
 
                     string json = CreateJsonFile(dictonary.Dictionary);
-                    DirectoryInfo dirInfo = new DirectoryInfo(outputPath);
+                    var dirInfo = new DirectoryInfo(outputPath);
 
                     string outPath = dirInfo.FullName + @"\" + languageCode + @"\" + fileInfo.Name;
                     SaveJson(json, outPath);
@@ -116,7 +111,7 @@ namespace JsonToCsv
             {
                 var localizedDictionaries = new List<i18nDirectoryFile>();
                 dictionaries.ForEach(
-                    d => localizedDictionaries.Add(new i18nDirectoryFile()
+                    d => localizedDictionaries.Add(new i18nDirectoryFile
                     {
                         FileInfo = d.FileInfo,
                         Dictionary = d.Dictionary.ToDictionary(item => item.Key, item => (object)(item.Value + "_" + languageCode))
@@ -126,11 +121,57 @@ namespace JsonToCsv
             }
         }
 
+        public void GenerateLongestStringsFile(string filePath, string outputPath)
+        {
+            var dictionaries = LoadJsonFileOrFolder(filePath);
+
+            if (dictionaries.Count > 0)
+            {
+                var getUniqueKeys = dictionaries.SelectMany(d => d.Dictionary.Keys).Distinct().ToList();
+
+                var longestDictionary = new i18nDirectoryFile()
+                {
+                    Dictionary = new Dictionary<string, object>(),
+                    FileInfo = new FileInfo(filePath),
+                };
+
+                getUniqueKeys.ForEach(
+                    k =>
+                        longestDictionary.Dictionary.Add(k,
+                            dictionaries.Select(d => d.Dictionary[k].ToString()).OrderByDescending(s => s.Length).First()));
+
+                SaveDictionaries(outputPath, new List<i18nDirectoryFile>() {longestDictionary}, SaveType.Json, "dev_Longest");
+            }
+        }
+
+        public void GenerateShortestStringsFile(string filePath, string outputPath)
+        {
+            var dictionaries = LoadJsonFileOrFolder(filePath);
+
+            if (dictionaries.Count > 0)
+            {
+                var getUniqueKeys = dictionaries.SelectMany(d => d.Dictionary.Keys).Distinct().ToList();
+
+                var longestDictionary = new i18nDirectoryFile()
+                {
+                    Dictionary = new Dictionary<string, object>(),
+                    FileInfo = new FileInfo(filePath),
+                };
+
+                getUniqueKeys.ForEach(
+                    k =>
+                        longestDictionary.Dictionary.Add(k,
+                            dictionaries.Select(d => d.Dictionary[k].ToString()).OrderByDescending(s => s.Length).Last()));
+
+                SaveDictionaries(outputPath, new List<i18nDirectoryFile>() { longestDictionary }, SaveType.Json, "dev_Shortest");
+            }
+        }
+
         public bool IsDirectory(string path)
         {
             bool result = true;
-            System.IO.FileInfo fileTest = new System.IO.FileInfo(path);
-            if (fileTest.Exists == true)
+            var fileTest = new FileInfo(path);
+            if (fileTest.Exists)
             {
                 result = false;
             }
@@ -155,8 +196,8 @@ namespace JsonToCsv
             {
                 var info = new FileInfo(filePath);
 
-                var i18nDictionary = CreateDictionaryFromFile(filePath);
-                output.Add(new i18nDirectoryFile() { FileInfo = info, Dictionary = i18nDictionary });
+                var i18NDictionary = CreateDictionaryFromFile(filePath);
+                output.Add(new i18nDirectoryFile { FileInfo = info, Dictionary = i18NDictionary });
             }
             else
             {
@@ -167,7 +208,7 @@ namespace JsonToCsv
                     var info = new FileInfo(file);
 
                     var i18nDictionary = CreateDictionaryFromFile(file);
-                    output.Add(new i18nDirectoryFile() { FileInfo = info, Dictionary = i18nDictionary });
+                    output.Add(new i18nDirectoryFile { FileInfo = info, Dictionary = i18nDictionary });
                 }
             }
 
@@ -176,22 +217,15 @@ namespace JsonToCsv
 
         public List<String> DirSearch(string sDir)
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(sDir);
-            List<String> files = new List<String>();
-            try
+            var dirInfo = new DirectoryInfo(sDir);
+            var files = new List<String>();
+            foreach (string f in Directory.GetFiles(dirInfo.FullName))
             {
-                foreach (string f in Directory.GetFiles(dirInfo.FullName))
-                {
-                    files.Add(f);
-                }
-                foreach (string d in Directory.GetDirectories(dirInfo.FullName))
-                {
-                    files.AddRange(DirSearch(d));
-                }
+                files.Add(f);
             }
-            catch (System.Exception)
+            foreach (string d in Directory.GetDirectories(dirInfo.FullName))
             {
-                throw;
+                files.AddRange(DirSearch(d));
             }
 
             return files;
@@ -210,24 +244,27 @@ namespace JsonToCsv
 
                 using (var reader = new StreamReader(File.OpenRead(filePath)))
                 {
-                    Dictionary<string, object> i18nDictionary = new Dictionary<string, object>();
+                    var i18NDictionary = new Dictionary<string, object>();
 
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        var values = line.Split(',');
+                        if (line != null)
+                        {
+                            var values = line.Split(',');
 
-                        i18nDictionary.Add(values[0].Trim('"'), values[1].Trim('"'));
+                            i18NDictionary.Add(values[0].Trim('"'), values[1].Trim('"'));
+                        }
                     }
 
-                    output.Add(new i18nDirectoryFile() { FileInfo = info, Dictionary = i18nDictionary });
+                    output.Add(new i18nDirectoryFile { FileInfo = info, Dictionary = i18NDictionary });
                 }
             }
 
             return output;
         }
 
-        private void SaveDictionaries(string outputPath,List<i18nDirectoryFile> dictionaries, SaveType type, string languageCode = null)
+        private void SaveDictionaries(string outputPath, IEnumerable<i18nDirectoryFile> dictionaries, SaveType type, string languageCode = null)
         {
             foreach (i18nDirectoryFile dictionaryItem in dictionaries)
             {
@@ -249,8 +286,8 @@ namespace JsonToCsv
 
         private string CreateJsonFile(Dictionary<string, object> dictionary)
         {
-            var parser = new I18nJsonParser(); //using System.Web.Script.Serialization;
-            object jsonObject = parser.GenerateJsonObject(dictionary, "");
+            var parser = new I18NJsonParser(); //using System.Web.Script.Serialization;
+            object jsonObject = parser.GenerateJsonObject(dictionary);
 
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject, Newtonsoft.Json.Formatting.Indented);
 
@@ -267,27 +304,27 @@ namespace JsonToCsv
 
         private Dictionary<string, object> CreateDictionaryFromJson(string json)
         {
-            I18nJsonParser i18nParser = new I18nJsonParser();
+            var i18NParser = new I18NJsonParser();
             var reader = new JsonReader();
             dynamic jsonObject = reader.Read(json);
-            Dictionary<string, object> i18nDictionary = new Dictionary<string, object>();
+            var i18NDictionary = new Dictionary<string, object>();
 
-            i18nParser.GenerateDictionary((ExpandoObject)jsonObject, i18nDictionary, "");
+            i18NParser.GenerateDictionary((ExpandoObject)jsonObject, i18NDictionary, "");
 
-            return i18nDictionary;
+            return i18NDictionary;
         }
 
         private void SaveDictionary(Dictionary<string, object> i18NDictionary, string filePath)
         {
             string directory = Path.GetDirectoryName(filePath);
-            CreateDirectory(new DirectoryInfo(directory));
+            if (directory != null) CreateDirectory(new DirectoryInfo(directory));
 
             File.WriteAllLines(filePath, i18NDictionary.Select(x => "\"" + x.Key + "\",\"" + x.Value + "\""));
         }
 
         public void CreateDirectory(DirectoryInfo directory)
         {
-            if (!directory.Parent.Exists)
+            if (directory.Parent != null && !directory.Parent.Exists)
                 CreateDirectory(directory.Parent);
             directory.Create();
         }
@@ -295,26 +332,14 @@ namespace JsonToCsv
         private void SaveJson(string json, string filePath)
         {
             string directory = Path.GetDirectoryName(filePath);
-            CreateDirectory(new DirectoryInfo(directory));
+            if (directory != null) CreateDirectory(new DirectoryInfo(directory));
 
             File.WriteAllText(filePath, json);
         }
 
-        private Dictionary<string, object> AppendStringToLocaleValue(Dictionary<string, object> i18nDictionary, string postFix)
-        {
-            var localizedDictionary = i18nDictionary.ToDictionary(entry => entry.Key, entry => entry.Value);
-
-            foreach (KeyValuePair<string, object> entry in i18nDictionary)
-            {
-                localizedDictionary[entry.Key] = entry.Value + "_" + postFix;
-            }
-
-            return localizedDictionary;
-        }
-
         private string ConstructFilePath(string outDir, FileInfo fileInfo, SaveType type, string languageCode = null)
         {
-            List<string> pathItems = new List<string>();
+            var pathItems = new List<string>();
 
             if (outDir[outDir.Length - 1] == '\\')
             {

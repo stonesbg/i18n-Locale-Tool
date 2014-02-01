@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace i18n.Helper
 {
-    public class I18nJsonParser
+    public class I18NJsonParser
     {
-        public void GenerateDictionary(System.Dynamic.ExpandoObject output, Dictionary<string, object> dict, string parent)
+        public void GenerateDictionary(ExpandoObject output, Dictionary<string, object> dict, string parent)
         {
             foreach (var v in output)
             {
                 string key = parent + v.Key;
                 object o = v.Value;
 
-                if (o.GetType() == typeof(System.Dynamic.ExpandoObject))
+                if (o is ExpandoObject)
                 {
-                    GenerateDictionary((System.Dynamic.ExpandoObject)o, dict, key + ".");
+                    GenerateDictionary((ExpandoObject)o, dict, key + ".");
                 }
                 else
                 {
@@ -34,17 +32,15 @@ namespace i18n.Helper
             object val;
             if (dict.TryGetValue(prefix, out val))
                 return val;
-            else
+            
+            if (!string.IsNullOrEmpty(prefix))
+                prefix += ".";
+            var children = new Dictionary<string, object>();
+            foreach (var child in dict.Where(x => x.Key.StartsWith(prefix)).Select(x => prefix != null ? x.Key.Substring(prefix.Length).Split(new[] { '.' }, 2)[0] : null).Distinct())
             {
-                if (!string.IsNullOrEmpty(prefix))
-                    prefix += ".";
-                var children = new Dictionary<string, object>();
-                foreach (var child in dict.Where(x => x.Key.StartsWith(prefix)).Select(x => x.Key.Substring(prefix.Length).Split(new[] { '.' }, 2)[0]).Distinct())
-                {
-                    children[child] = GenerateJsonObject(dict, prefix + child);
-                }
-                return children;
+                children[child] = GenerateJsonObject(dict, prefix + child);
             }
+            return children;
         }
     }
 }

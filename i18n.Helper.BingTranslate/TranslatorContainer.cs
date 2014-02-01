@@ -14,12 +14,9 @@
 //            If you do not agree to these terms you may not use this content.
 namespace Microsoft {
     using System;
-    using System.Collections.Generic;
     using System.Data.Services.Client;
-    using System.Net;
-    using System.IO;
-    
-    
+
+
     public partial class Translation {
         
         private String _Text;

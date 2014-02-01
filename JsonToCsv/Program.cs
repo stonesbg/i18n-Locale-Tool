@@ -1,37 +1,26 @@
-﻿using JsonFx.Json;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Data.Services.Client;
-using Microsoft;
-using i18n.LocaleTool;
 using CommandLine;
+using i18n.Helper;
 
-namespace JsonToCsv
+namespace i18n.LocaleTool
 {
     public class Program
     {
         static void Main(string[] args)
         {
-            i18nHandler handler = new i18nHandler();
+            var handler = new I18NHandler();
 
-            ///Parse Command Line
-            Options options = new Options();
-            Parser parser = new Parser();
+            var options = new Options();
+            var parser = new Parser();
             if (parser.ParseArguments(args, options))
             {
                 // consume Options type properties
                 if (options.Verbose)
                 {
-                    Console.WriteLine(options.InputFileFolder);
-                    Console.WriteLine(options.OutputFileFolder);
-                    Console.WriteLine(options.TargetLanguage);
+                    Console.WriteLine("Input File/Folder: " + options.InputFileFolder);
+                    Console.WriteLine("Output File/Folder: " + options.OutputFileFolder);
+                    Console.WriteLine("Target Language: " + options.TargetLanguage);
                 }
                 else
                     Console.WriteLine("working ...");
@@ -51,110 +40,113 @@ namespace JsonToCsv
             Console.WriteLine();
             Console.Out.Flush();
             Console.WriteLine("Press ESC to exit application");
-
-            string filePath;
-            string outputPath;
-            string languageCode;
-
             do 
             {
-            cki = Console.ReadKey(true);
-            switch (cki.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.WriteLine("Option 1 Selected");
+                cki = Console.ReadKey(true);
 
-                    if (String.IsNullOrEmpty(options.InputFileFolder))
-                    {
-                        options.InputFileFolder = WaitForUserInput("Path to Folder of Json Files or File:");
-                    }
+                if (String.IsNullOrEmpty(options.InputFileFolder))
+                {
+                    options.InputFileFolder = CheckFilePathExists("Path to Folder of Json Files or File:");
+                }
 
-                    if (String.IsNullOrEmpty(options.OutputFileFolder))
-                    {
-                        options.OutputFileFolder = WaitForUserInput("Folder where file(s) to be saved or leave empty:");
-                    }
+                if (String.IsNullOrEmpty(options.OutputFileFolder))
+                {
+                    options.OutputFileFolder = CheckFilePathExists("Folder where file(s) to be saved:", false);
+                }
 
+                switch (cki.Key)
+                {
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine("Option 1 Selected");
 
-                    if (handler.IsDirectory(options.InputFileFolder))
-                    {
-                        foreach (string file in handler.DirSearch(options.InputFileFolder))
+                        if (handler.IsDirectory(options.InputFileFolder))
                         {
-                            handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Csv);
+                            foreach (string file in handler.DirSearch(options.InputFileFolder))
+                            {
+                                handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Csv);
+                            }
                         }
-                    }
-                    else
-                    {
-                        handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Csv);
-                    }
-                    
-                    Console.WriteLine("File Created");
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.WriteLine("Option 2 Selected");
-                    filePath = WaitForUserInput("Path to Folder of Json Files or File:");
-                    outputPath = WaitForUserInput("Folder where file(s) to be saved:");
-
-                    if (handler.IsDirectory(filePath))
-                    {
-                        foreach (string file in handler.DirSearch(filePath))
+                        else
                         {
-                            handler.CreateDictionaryFile(file, outputPath, SaveType.Json);
+                            handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Csv);
                         }
-                    }
-                    else
-                    {
-                        handler.CreateDictionaryFile(filePath, outputPath, SaveType.Json);
-                    }
-                    
-                    Console.WriteLine("File Created");
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    languageCode = WaitForUserInput("Enter Language code (i.e. de-DE):");
-                    Console.WriteLine("Generating File with the code: " + languageCode);
-                    filePath = CheckFilePathExists("Path to Folder of Json Files or File:");
-                    outputPath = CheckFilePathExists("Folder where file(s) to be saved:", false);
 
-                    handler.GenerateFakeJsonFileForLanguageCode(languageCode, filePath, outputPath);
+                        Console.WriteLine("Complete");
+                        break;
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        Console.WriteLine("Option 2 Selected");
 
-                    Console.WriteLine("Complete");
-                    break;
-                case ConsoleKey.D4:
-                case ConsoleKey.NumPad4:
-                    Console.Write("4");
-                    Console.WriteLine();
-
-                    break;
-                case ConsoleKey.D5:
-                case ConsoleKey.NumPad5:
-                    Console.Write("5");
-                    Console.WriteLine();
-                    break;
-                case ConsoleKey.D6:
-                case ConsoleKey.NumPad6:
-                    languageCode = WaitForUserInput("Enter Language code (i.e. de-DE):");
-                    Console.WriteLine("Generating File with the code: " + languageCode);
-
-                    filePath = WaitForUserInput("Path to Folder of Json Files or File:");
-                    outputPath = WaitForUserInput("Folder where file(s) to be saved:");
-
-                    if (handler.IsDirectory(filePath))
-                    {
-                        foreach (string file in handler.DirSearch(filePath))
+                        if (handler.IsDirectory(options.InputFileFolder))
                         {
-                            handler.TranslateDictionaryFile(languageCode, file, outputPath);
+                            foreach (string file in handler.DirSearch(options.InputFileFolder))
+                            {
+                                handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Json);
+                            }
                         }
-                    }
-                    else
-                    {
-                        handler.TranslateDictionaryFile(languageCode, filePath, outputPath);
-                    }
+                        else
+                        {
+                            handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Json);
+                        }
 
-                    Console.WriteLine("Complete");
-                    break;
-            }
+                        Console.WriteLine("Complete");
+                        break;
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
+                        Console.WriteLine("Option 3 Selected");
+
+                        if (String.IsNullOrEmpty(options.TargetLanguage))
+                        {
+                            options.TargetLanguage = WaitForUserInput("Enter Language code (i.e. de-DE):");
+                            Console.WriteLine("Generating File with the code: " + options.TargetLanguage);
+                        }
+
+                        handler.GenerateFakeJsonFileForLanguageCode(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
+
+                        Console.WriteLine("Complete");
+                        break;
+                    case ConsoleKey.D4:
+                    case ConsoleKey.NumPad4:
+                        Console.WriteLine("Option 4 Selected");
+
+                        handler.GenerateLongestStringsFile(options.InputFileFolder, options.OutputFileFolder);
+
+                        Console.WriteLine("Complete");
+                        break;
+                    case ConsoleKey.D5:
+                    case ConsoleKey.NumPad5:
+                        Console.WriteLine("Option 5 Selected");
+
+                        handler.GenerateShortestStringsFile(options.InputFileFolder, options.OutputFileFolder);
+
+                        Console.WriteLine("Complete");
+                        break;
+                    case ConsoleKey.D6:
+                    case ConsoleKey.NumPad6:
+                        Console.WriteLine("Option 6 Selected");
+
+                        if (String.IsNullOrEmpty(options.TargetLanguage))
+                        {
+                            options.TargetLanguage = WaitForUserInput("Enter Language code (i.e. de-DE):");
+                            Console.WriteLine("Generating File with the code: " + options.TargetLanguage);
+                        }
+
+                        if (handler.IsDirectory(options.InputFileFolder))
+                        {
+                            foreach (string file in handler.DirSearch(options.InputFileFolder))
+                            {
+                                handler.TranslateDictionaryFile(options.TargetLanguage, file, options.OutputFileFolder);
+                            }
+                        }
+                        else
+                        {
+                            handler.TranslateDictionaryFile(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
+                        }
+
+                        Console.WriteLine("Complete");
+                        break;
+                }
             } while (cki.Key != ConsoleKey.Escape);
         }
 
