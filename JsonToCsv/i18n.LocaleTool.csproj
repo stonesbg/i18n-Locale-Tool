@@ -42,13 +42,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration">
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Web" />
@@ -69,6 +71,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\i18n.Helper.Contracts\i18n.Helper.Contracts.csproj">
+      <Project>{3B019C1C-293B-4178-A5F5-4340AB6DC79D}</Project>
+      <Name>i18n.Helper.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\i18n.Helper\i18n.Helper.csproj">
       <Project>{ab3f7aeb-0f86-44ec-8915-babce2a82124}</Project>
       <Name>i18n.Helper</Name>

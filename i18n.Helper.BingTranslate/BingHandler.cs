@@ -5,7 +5,7 @@ using System.Net;
 
 namespace i18n.Helper.BingTranslate
 {
-    public class BingHandler
+    public class BingHandler : IBingHandler
     {
         TranslatorContainer _tc = null;
         public BingHandler()

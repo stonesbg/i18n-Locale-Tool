@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using i18n.Helper.Contracts;
 
 namespace i18n.Helper
 {
-    public class I18NJsonParser
+    public class i18nJsonParser : Ii18nJsonParser
     {
         public void GenerateDictionary(ExpandoObject output, Dictionary<string, object> dict, string parent)
         {

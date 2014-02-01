@@ -3,7 +3,7 @@ using System.IO;
 
 namespace i18n.LocaleTool.Models
 {
-    public class i18nDirectoryFile
+    public class I18NDirectoryFile
     {
         public FileInfo FileInfo { get; set; }
         public Dictionary<string, object> Dictionary { get; set; }

@@ -42,7 +42,7 @@ namespace i18n.Helper.UnitTests
                 ""nodata"": ""This list does not contain any items.""
             }}";
 
-            var parser = new I18NJsonParser(); //using System.Web.Script.Serialization;
+            var parser = new i18nJsonParser(); //using System.Web.Script.Serialization;
             var reader = new JsonFx.Json.JsonReader();
             dynamic output = reader.Read(json);
             var dict = new Dictionary<string, object>();
@@ -63,7 +63,7 @@ namespace i18n.Helper.UnitTests
             localizationValues.Add("actions.edit.default", "editor");
             localizationValues.Add("actions.edit.edit", "update");
 
-            var parser = new I18NJsonParser(); //using System.Web.Script.Serialization;
+            var parser = new i18nJsonParser(); //using System.Web.Script.Serialization;
             object jsonObject = parser.GenerateJsonObject(localizationValues, "");
 
             string json = JsonConvert.SerializeObject(jsonObject, new KeyValuePairConverter());

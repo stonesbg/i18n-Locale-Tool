@@ -45,8 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileHandler.cs" />
     <Compile Include="I18NHandler.cs" />
     <Compile Include="I18NJsonParser.cs" />
+    <Compile Include="LocalizationHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -54,9 +56,13 @@
       <Project>{d6a7337f-4cd2-45a1-b04c-324739076ac5}</Project>
       <Name>i18n.Helper.BingTranslate</Name>
     </ProjectReference>
-    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.LocaleTool.Models.csproj">
+    <ProjectReference Include="..\i18n.Helper.Contracts\i18n.Helper.Contracts.csproj">
+      <Project>{3b019c1c-293b-4178-a5f5-4340ab6dc79d}</Project>
+      <Name>i18n.Helper.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.Helper.Models.csproj">
       <Project>{2791e587-d414-4258-b822-30618359cff3}</Project>
-      <Name>i18n.LocaleTool.Models</Name>
+      <Name>i18n.Helper.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

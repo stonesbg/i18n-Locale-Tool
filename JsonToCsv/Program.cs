@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using CommandLine;
-using i18n.Helper;
+using i18n.Helper.Contracts;
+using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.Configuration;
 
 namespace i18n.LocaleTool
 {
@@ -9,7 +11,13 @@ namespace i18n.LocaleTool
     {
         static void Main(string[] args)
         {
-            var handler = new I18NHandler();
+            IUnityContainer container = new UnityContainer();
+
+            // Read interface->type mappings from app.config
+            container.LoadConfiguration();
+
+            // Resolve ILogger - this works
+            var handler = container.Resolve<ILocalizationHandler>();
 
             var options = new Options();
             var parser = new Parser();
@@ -60,17 +68,7 @@ namespace i18n.LocaleTool
                     case ConsoleKey.NumPad1:
                         Console.WriteLine("Option 1 Selected");
 
-                        if (handler.IsDirectory(options.InputFileFolder))
-                        {
-                            foreach (string file in handler.DirSearch(options.InputFileFolder))
-                            {
-                                handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Csv);
-                            }
-                        }
-                        else
-                        {
-                            handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Csv);
-                        }
+                        handler.FlattenLocalizationFile(options.InputFileFolder, options.OutputFileFolder);
 
                         Console.WriteLine("Complete");
                         break;
@@ -78,17 +76,7 @@ namespace i18n.LocaleTool
                     case ConsoleKey.NumPad2:
                         Console.WriteLine("Option 2 Selected");
 
-                        if (handler.IsDirectory(options.InputFileFolder))
-                        {
-                            foreach (string file in handler.DirSearch(options.InputFileFolder))
-                            {
-                                handler.CreateDictionaryFile(file, options.OutputFileFolder, SaveType.Json);
-                            }
-                        }
-                        else
-                        {
-                            handler.CreateDictionaryFile(options.InputFileFolder, options.OutputFileFolder, SaveType.Json);
-                        }
+                        handler.FlattenLocalizationFile(options.InputFileFolder, options.OutputFileFolder);
 
                         Console.WriteLine("Complete");
                         break;
@@ -102,7 +90,7 @@ namespace i18n.LocaleTool
                             Console.WriteLine("Generating File with the code: " + options.TargetLanguage);
                         }
 
-                        handler.GenerateFakeJsonFileForLanguageCode(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
+                        handler.GenerateFakeLocalizationFile(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
 
                         Console.WriteLine("Complete");
                         break;
@@ -132,17 +120,7 @@ namespace i18n.LocaleTool
                             Console.WriteLine("Generating File with the code: " + options.TargetLanguage);
                         }
 
-                        if (handler.IsDirectory(options.InputFileFolder))
-                        {
-                            foreach (string file in handler.DirSearch(options.InputFileFolder))
-                            {
-                                handler.TranslateDictionaryFile(options.TargetLanguage, file, options.OutputFileFolder);
-                            }
-                        }
-                        else
-                        {
-                            handler.TranslateDictionaryFile(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
-                        }
+                        handler.TranslateLocalizationFile(options.TargetLanguage, options.InputFileFolder, options.OutputFileFolder);
 
                         Console.WriteLine("Complete");
                         break;
@@ -181,8 +159,6 @@ namespace i18n.LocaleTool
                 userInput = Console.ReadLine();
             } while (string.IsNullOrEmpty(userInput));
 
-
-            //Console.WriteLine("Input [" + userInput + "]");
             return userInput;
         }
     }

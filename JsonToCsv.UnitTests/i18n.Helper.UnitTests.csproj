@@ -39,8 +39,17 @@
       <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture">
+      <HintPath>..\packages\AutoFixture.3.16.5\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.AutoMoq">
+      <HintPath>..\packages\AutoFixture.AutoMoq.3.16.5\lib\net40\Ploeh.AutoFixture.AutoMoq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web.Extensions" />
@@ -63,16 +72,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\i18n.Helper.Contracts\i18n.Helper.Contracts.csproj">
+      <Project>{3b019c1c-293b-4178-a5f5-4340ab6dc79d}</Project>
+      <Name>i18n.Helper.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\i18n.Helper\i18n.Helper.csproj">
       <Project>{ab3f7aeb-0f86-44ec-8915-babce2a82124}</Project>
       <Name>i18n.Helper</Name>
     </ProjectReference>
-    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.LocaleTool.Models.csproj">
+    <ProjectReference Include="..\i18n.LocaleTool.Models\i18n.Helper.Models.csproj">
       <Project>{2791e587-d414-4258-b822-30618359cff3}</Project>
-      <Name>i18n.LocaleTool.Models</Name>
+      <Name>i18n.Helper.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
