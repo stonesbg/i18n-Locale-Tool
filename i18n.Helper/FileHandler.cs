@@ -3,35 +3,21 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using i18n.Helper.Contracts;
 using i18n.LocaleTool.Models;
 using JsonFx.Json;
 
 namespace i18n.Helper
 {
-    public interface IFileHandler
-    {
-        Dictionary<string, object> ReadJsonFile(string filePath);
-
-        void SaveJson(string json, string filePath);
-
-        void SaveDictionary(Dictionary<string, object> i18NDictionary, string filePath);
-
-        bool IsDirectory(string path);
-
-        List<String> DirSearch(string sDir);
-
-        List<I18NDirectoryFile> LoadJsonFileOrFolder(string filePath);
-
-        List<I18NDirectoryFile> LoadCsvFileOrFolder(string filePath);
-
-        string ConstructFilePath(string outDir, FileInfo fileInfo, SaveType type, string languageCode);
-    }
-
     public class FileHandler : IFileHandler
     {
+        private readonly Ii18nJsonParser _jsonParser;
+
+        public FileHandler(Ii18nJsonParser jsonParser)
+        {
+            _jsonParser = jsonParser;
+        }
+
         public Dictionary<string, object> ReadJsonFile(string filePath)
         {
             //Load in File
@@ -42,12 +28,11 @@ namespace i18n.Helper
 
         private Dictionary<string, object> CreateDictionaryFromJson(string json)
         {
-            var i18NParser = new i18nJsonParser();
             var reader = new JsonReader();
             dynamic jsonObject = reader.Read(json);
             var i18NDictionary = new Dictionary<string, object>();
 
-            i18NParser.GenerateDictionary((ExpandoObject)jsonObject, i18NDictionary, "");
+            _jsonParser.GenerateDictionary((ExpandoObject)jsonObject, i18NDictionary, "");
 
             return i18NDictionary;
         }
